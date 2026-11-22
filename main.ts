@@ -1,37 +1,9 @@
-import{readFileSync as A,writeFileSync as B,mkdirSync as C,readdirSync as D}from"node:fs";
-let Z={16:(a,b)=>a+b|0,17:(a,b)=>a-b|0,18:(a,b)=>Math.imul(a,b),19:(a,b)=>b?(a/b)|0:NaN,20:(a,b)=>b?a%b:NaN,21:(a,b)=>b?(a>>>0)/(b>>>0)|0:NaN,22:(a,b)=>b?(a>>>0)%(b>>>0)|0:NaN,24:(a,b)=>a&b,25:(a,b)=>a|b,26:(a,b)=>a^b,28:(a,b)=>a<<(b&31),29:(a,b)=>a>>(b&31),30:(a,b)=>a>>>(b&31),32:(a,b)=>a==b?1:0,33:(a,b)=>a<b?1:0,34:(a,b)=>(a>>>0)<(b>>>0)?1:0};
-for(let I of D("/input").sort()){
-let P=A("/input/"+I+"/program.bin"),N=A("/input/"+I+"/input.bin"),S=[],K=[],M=new Int32Array(256),O="",p=0,s=0,j=0,e=0,x=0;
-let g=()=>P[x]|P[x+1]<<8,U=n=>{if(S.length<n){e=2;return 1}},V=v=>{if(S.length>255){e=3;return 1}S.push(v|0)};
-X:for(;;){
-if(s++>=1e6){e=10;break}
-if(p<0||p>=P.length){e=9;break}
-let o=P[p];x=p+1;
-switch(o){
-case 0:e=0;break X;
-case 1:if(x>=P.length){e=9;break X}if(V(P[x]<<24>>24))break X;p=x+1;break;
-case 2:if(x+3>=P.length){e=9;break X}if(V(P[x]|P[x+1]<<8|P[x+2]<<16|P[x+3]<<24))break X;p=x+4;break;
-case 3:if(U(1))break X;S.pop();p=x;break;
-case 4:if(U(1))break X;if(V(S[S.length-1]))break X;p=x;break;
-case 5:if(U(2))break X;S.push(S.pop(),S.pop());p=x;break;
-case 6:if(U(2))break X;if(V(S[S.length-2]))break X;p=x;break;
-case 7:if(U(3))break X;S.push(S.splice(S.length-3,1)[0]);p=x;break;
-case 23:if(U(1))break X;S[S.length-1]=-S[S.length-1]|0;p=x;break;
-case 27:if(U(1))break X;S[S.length-1]=~S[S.length-1];p=x;break;
-case 48:if(x+1>=P.length){e=9;break X}p=x+2+(g()<<16>>16);break;
-case 49:case 50:if(x+1>=P.length){e=9;break X}if(U(1))break X;{let v=S.pop();p=(o==49)==(v==0)?x+2+(g()<<16>>16):x+2}break;
-case 51:if(x+1>=P.length){e=9;break X}if(K.length>63){e=7;break X}K.push(x+2);p=g();break;
-case 52:if(!K.length){e=8;break X}p=K.pop();break;
-case 64:if(U(1))break X;{let a=S.pop();if(a<0||a>255){e=6;break X}S.push(M[a])}p=x;break;
-case 65:if(U(2))break X;{let a=S.pop(),v=S.pop();if(a<0||a>255){e=6;break X}M[a]=v}p=x;break;
-case 80:if(U(1))break X;{let v=S.pop(),t=""+v;if(O.length+t.length>65536){e=11;break X}O+=t}p=x;break;
-case 81:if(U(1))break X;{let v=S.pop();if(O.length+1>65536){e=11;break X}O+=String.fromCharCode(v&255)}p=x;break;
-case 82:if(V(j<N.length?N[j++]:-1))break X;p=x;break;
-case 83:if(U(1))break X;e=S.pop()&255;break X;
-default:{let f=Z[o];if(!f){e=5;break X}if(U(2))break X;let b=S.pop(),a=S.pop(),r=f(a,b);if(r!==r){e=4;break X}S.push(r|0);p=x}
-}
-}
-C("/output/"+I,{recursive:true});
-B("/output/"+I+"/stdout.bin",Buffer.from(O,"latin1"));
-B("/output/"+I+"/exit.txt",e+"\n");
+import{readFileSync as A,writeFileSync as B,mkdirSync as C,readdirSync as D}from"fs";
+let Z="a+b;a-b;Math.imul(a,b);b?a/b:NaN;b?a%b:NaN;b?(a>>>0)/(b>>>0):NaN;b?(a>>>0)%(b>>>0):NaN;;a&b;a|b;a^b;;a<<b;a>>b;a>>>b;;a==b;a<b;(a>>>0)<(b>>>0)".split(";").map(s=>s&&eval("(a,b)=>"+s)),u="/input/";
+for(let I of D(u)){
+let P=A(u+I+"/program.bin"),N=A(u+I+"/input.bin"),S=[],K=[],M=[],O="",p=0,s=0,j=0,e=-1,a,b,f,r,o,d,q;
+let g=()=>P[p]|P[p+1]<<8,U=n=>S.length<n?e=2:0,V=v=>S.length<256?S.push(v|0)&&0:e=3,Q=()=>S.length?S.pop():e=2;
+for(;e<0;)
+++s>1e6?e=10:p<0|p>=P.length?e=9:(o=P[p++],q=p+2+(g()<<16>>16),o==0?e=0:o==1?p>=P.length?e=9:V(P[p++]<<24>>24):o==2?p+3>=P.length?e=9:(V(P.readInt32LE(p)),p+=4):o==3?Q():o==4?U(1)?0:V(S.at(-1)):o==5?S.push(Q(),Q()):o==6?U(2)?0:V(S.at(-2)):o==7?U(3)?0:V(S.splice(-3,1)[0]):o==23?V(-Q()|0):o==27?V(~Q()):o==48?p+1>=P.length?e=9:p=q:o==49|o==50?p+1>=P.length?e=9:(a=Q(),p=(o==49)==(a==0)?q:p+2):o==51?p+1>=P.length?e=9:K[63]?e=7:(K.push(p+2),p=g()):o==52?K[0]?p=K.pop():e=8:o==64?(a=Q(),a>>8?e=6:V(M[a]|0)):o==65?(a=Q(),b=Q(),e<0&&a>>8?e=6:M[a]=b):o==80?U(1)?0:(a=Q(),O.length+(""+a).length>65536?e=11:O+=a):o==81?U(1)?0:(a=Q(),O.length>65535?e=11:O+=String.fromCharCode(a&255)):o==82?V(N[j++]??-1):o==83?e=Q()&255:(f=Z[o-16])?(b=Q(),a=Q(),r=f(a,b),e<0?r!==r?e=4:V(r|0):0):e=5);
+d="/output/"+I;C(d,{recursive:true});B(d+"/stdout.bin",O,"latin1");B(d+"/exit.txt",e+"\n");
 }
